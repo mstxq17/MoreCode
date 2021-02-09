@@ -1,2 +1,50 @@
 # MoreCode
-一个常用编码加解密的懒人工具，自动识别，尝试转换所有类型，包括html实体化，base64，base32，32位md5，16位md5，hash，\x,0x等十六进制格式,url编码...
+
+## Introduce
+
+主要是用于平时渗透测试、ctf之类的小工具，方便用命令行进行操作。
+
+后面我会加上一个setup.py,实现快速自动安装进path,然后直接在命令行使用
+
+`morecode -h`,来使用
+
+## 使用说明
+
+` python3 morecode.py -h`
+
+```
+
+     __  __                 ____ ___      _
+    |  \/  | ___  _ __ ___ / ___/ _ \  __| | ___
+    | |\/| |/ _ \| '__/ _ \ |  | | | |/ _` |/ _ \
+    | |  | | (_) | | |  __/ |__| |_| | (_| |  __/
+    |_|  |_|\___/|_|  \___|\____\___/ \__,_|\___|
+
+    Powered by MoreCode
+    Author xq17
+    Online Tools:https://tool.leavesongs.com/ (Others)
+
+usage: morecode.py [-h] [-d] [-e] string
+
+positional arguments:
+  string        converted-string
+
+optional arguments:
+  -h, --help    show this help message and exit
+  -d, --decode  decode string
+  -e, --encode  encode string
+```
+
+
+
+## 效果展示
+
+![image-20210209185152603](README.assets/image-20210209185152603.png)
+
+![image-20210209185213387](README.assets/image-20210209185213387.png)
+
+
+
+## TODO
+
+其实还有很多想法,后面慢慢填坑，有个Online在线文件，我也放在工具里面了，方便直接调用。
