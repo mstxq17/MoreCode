@@ -10,6 +10,7 @@ from termcolor import cprint
 print_decode = lambda string: cprint(string, 'magenta')
 print_encode = lambda string: cprint(string, 'red')
 print_preview = lambda string: cprint(string, 'green')
+print_type = lambda string: cprint(string, 'blue')
 
 # core class, utils
 class Utils:
@@ -17,11 +18,19 @@ class Utils:
     def __init__(self, arg=""):
         self.arg = arg
 
-    def html_encode(self, string):
-        encode1 = html.escape(string)
-        encode2 = html.escape(string, quote=True)
-        print_encode(encode1)
-        print_encode(encode2)
+    def html_encode(self, string, isChinese):
+        print_type("[0] HTML entities Type:")
+        encode1 = html.escape(string, quote=True)
+        encode2 = string.encode('ascii','xmlcharrefreplace').decode()
+        _charref = re.compile('[^(&(#\[0-9\]+;?)]|[^(&(#\[xX\]\[0-9a-fA-F\]+;?)]')
+        encode3 = re.sub(_charref, lambda x:"&#"+str(hex(ord(x.group(0)))).replace("0","")+";", encode2)
+        encode4 = re.sub("[^&](#{1})", lambda x:str(x.group(1)).replace("#","&#"+str(hex(ord("#"))).replace("0","")+";"),encode3)
+        print_encode(f"[Normal] >> {encode1}")
+        if isChinese:
+            print_encode(f"[Chinese] >> {encode2}")
+        print_encode(f"[More] >> {encode4}")
+        print_encode(f"[ALL] >> {encode4}")
+
 
     def html_decode(self, string):
         decode1 = html.unescape(string)
@@ -29,7 +38,7 @@ class Utils:
 
 def priview_handle(string):
     print_preview("Now, checking the string status...")
-    print(f"[+] string: {string}")
+    print(f"[+] string: {string.encode()} -> {string} ")
     print(f"[+] length: {len(string)}")
     _chardet = chardet.detect(string.encode())
     encoding = _chardet['encoding']
@@ -44,16 +53,19 @@ def priview_handle(string):
     print("[+] origin hex:", end="")
     cprint(binascii.hexlify(string.encode()), "yellow", end="   ")
     cprint(" ".join(["0x"+str(c) for c in string.encode()]), "yellow")
+    return match
 
 
-def decode(string):
+def decode(string, isChinese):
+    print_preview("\nDeCode Result:")
     utils = Utils()
-    print(utils.html_decode(string))
+    utils.html_decode(string, isChinese)
 
-def encode(string):
+def encode(string, isChinese):
+    print_preview("\nEnCode Result:")
     # html entity encode
     utils = Utils()
-    utils.html_encode(string)
+    utils.html_encode(string, isChinese)
 
 
 
@@ -82,12 +94,12 @@ def main():
     args = parse_param()
     string = args.string
     # check input string
-    priview_handle(string)
+    isChinese = priview_handle(string)
     # start to handle the input string
     if args.decode == True:
-        result =  decode(string)
+        result =  decode(string, isChinese)
     if args.encode == True:
-        result =  encode(string)
+        result =  encode(string, isChinese)
     if not args.decode and not args.encode:
         print("missing type to hanle string, example -d abc or -e abc")
 
