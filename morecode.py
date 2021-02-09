@@ -3,7 +3,10 @@
 
 import base64
 import argparse
-import html, binascii, chardet, re
+import re
+import html, binascii, chardet, base64
+import urllib.parse
+import hashlib
 from termcolor import cprint
 
 # configure the format of output
@@ -19,7 +22,7 @@ class Utils:
         self.arg = arg
 
     def html_encode(self, string, isChinese):
-        print_type("[0] HTML entities Type:")
+        print_type("[0] HTML entities Encode:")
         encode1 = html.escape(string, quote=True)
         encode2 = string.encode('ascii','xmlcharrefreplace').decode()
         _charref = re.compile('[^(&(#\[0-9\]+;?)]|[^(&(#\[xX\]\[0-9a-fA-F\]+;?)]')
@@ -31,10 +34,58 @@ class Utils:
         print_encode(f"[More] >> {encode4}")
         print_encode(f"[ALL] >> {encode4}")
 
+    def url_encode(self, string):
+        print_type("[1] URL Encode:")
+        encode1 = urllib.parse.quote(string.encode())
+        encode2 =  ''.join('%{:02X}'.format(c) for c in string.encode())
+        print_encode(f"[Normal] >> {encode1}")
+        print_encode(f"[ALL] >> {encode2}")
+
+    def md5_encode(self, string):
+        print_type("[2] MD5 Encode:")
+        encode1 = hashlib.md5(string.encode()).hexdigest()
+        print_encode(f"[16 md5] >> {encode1[8:24]}")
+        print_encode(f"[32 md5] >> {encode1}")
+
+    def base64_encode(self, string):
+        print_type("[3] BASE64 Encode:")
+        encode1 = base64.b64encode(string.encode())
+        print_encode(f"[base64] >> {encode1}")
+
+    def chr_encode(self, string, isChinese):
+        print_type("[4] CHR Encode:")
+        if isChinese:
+            print_encode(f"[chr] >> Not support chinese")
+        else:
+            encode1 = "+".join(["chr("+str(ord(i)) + ")" for i in  string])
+            encode2 = "&".join(["chr("+str(ord(i)) + ")" for i in  string])
+            print_encode(f"[chr:+] >> {encode1}")
+            print_encode(f"[chr:&] >> {encode2}")
+
+
+
 
     def html_decode(self, string):
+        print_type("[0] HTML entities Decode:")
         decode1 = html.unescape(string)
-        print_decode(decode1)
+        print_decode(f"[Normal] >> {decode1}")
+
+    def url_decode(self, string):
+        print_type("[1] URL Decode:")
+        decode1 = urllib.parse.unquote(string.encode())
+        print_decode(f"[Normal] >> {decode1}")
+
+    def base64_decode(self, string):
+        print_type("[3] BASE64 Decode:")
+        try:
+            decode1 = base64.b64decode(string.encode()).decode()
+            print_decode(f"[base64] >> {decode1}")
+        except:
+            print_decode(f"[base64] >> Error")
+
+    def chr_decode(self, string):
+        pass
+
 
 def priview_handle(string):
     print_preview("Now, checking the string status...")
@@ -59,13 +110,20 @@ def priview_handle(string):
 def decode(string, isChinese):
     print_preview("\nDeCode Result:")
     utils = Utils()
-    utils.html_decode(string, isChinese)
+    utils.html_decode(string)
+    utils.url_decode(string)
+    utils.base64_decode(string)
+    utils.chr_decode(string)
 
 def encode(string, isChinese):
     print_preview("\nEnCode Result:")
     # html entity encode
     utils = Utils()
     utils.html_encode(string, isChinese)
+    utils.url_encode(string)
+    utils.md5_encode(string)
+    utils.base64_encode(string)
+    utils.chr_encode(string, isChinese)
 
 
 
@@ -81,6 +139,7 @@ def parse_param():
 
     Powered by MoreCode
     Author xq17
+    Online Tools:https://tool.leavesongs.com/ (Others)
     """
     print(logo)
     parser = argparse.ArgumentParser()
