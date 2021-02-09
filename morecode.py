@@ -3,24 +3,59 @@
 
 import base64
 import argparse
-import html
+import html, binascii, chardet, re
 from termcolor import cprint
 
 # configure the format of output
-print_decode = lambda x: cprint(x, 'magenta')
-print_encode = lambda x: cprint(x, 'red')
+print_decode = lambda string: cprint(string, 'magenta')
+print_encode = lambda string: cprint(string, 'red')
+print_preview = lambda string: cprint(string, 'green')
+
+# core class, utils
+class Utils:
+    """utils include many functions to encode/decode"""
+    def __init__(self, arg=""):
+        self.arg = arg
+
+    def html_encode(self, string):
+        encode1 = html.escape(string)
+        encode2 = html.escape(string, quote=True)
+        print_encode(encode1)
+        print_encode(encode2)
+
+    def html_decode(self, string):
+        decode1 = html.unescape(string)
+        print_decode(decode1)
+
+def priview_handle(string):
+    print_preview("Now, checking the string status...")
+    print(f"[+] string: {string}")
+    print(f"[+] length: {len(string)}")
+    _chardet = chardet.detect(string.encode())
+    encoding = _chardet['encoding']
+    print(f"[+] Chardet: {_chardet}")
+    zhPattern = re.compile(u'[\u4e00-\u9fa5]+')
+    match = zhPattern.search(string)
+    print("[+] Type: ", end="")
+    if match:
+        cprint("Chinese char in string", "white", "on_cyan")
+    else:
+        cprint("ASCII String", "white", "on_grey")
+    print("[+] origin hex:", end="")
+    cprint(binascii.hexlify(string.encode()), "yellow", end="   ")
+    cprint(" ".join(["0x"+str(c) for c in string.encode()]), "yellow")
 
 
 def decode(string):
-    html_decode = html.unescape(string)
-    print_decode(html_decode)
+    utils = Utils()
+    print(utils.html_decode(string))
 
 def encode(string):
     # html entity encode
-    html_encode1 = html.escape(string)
-    html_encode2 = html.escape(string, quote=True)
-    html_encode3 = html.escape(string, quote=True)
-    print_encode(html_encode)
+    utils = Utils()
+    utils.html_encode(string)
+
+
 
 # handle input param
 # doc link:https://docs.python.org/zh-cn/3/howto/argparse.html
@@ -45,8 +80,10 @@ def parse_param():
 
 def main():
     args = parse_param()
-    string = args.string.strip()
-    # try to decode string
+    string = args.string
+    # check input string
+    priview_handle(string)
+    # start to handle the input string
     if args.decode == True:
         result =  decode(string)
     if args.encode == True:
