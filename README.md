@@ -8,6 +8,21 @@
 
 `morecode -h`,来使用
 
+>感谢T00ls的兄弟提供一种方案:
+>
+>```
+>vi .bash_profile
+>function mc {
+>  python3 /path/to/morecode.py $1 $2
+>}
+>source .bash_profile
+>
+>mc -e '123'
+>mc -d '123'
+>```
+
+
+
 ## 使用说明
 
 ` python3 morecode.py -h`
