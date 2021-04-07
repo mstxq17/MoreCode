@@ -75,8 +75,9 @@ class Utils:
 
     def unicode_decode(self, string):
         print_type("[5] Unicode Decode:")
+        string = string.encode("utf-8").decode('unicode_escape')
         print_decode(f"[Normal] >> {string}")
-        print(string)
+        # print(string)
 
     def html_decode(self, string):
         print_type("[0] HTML entities Decode:")
