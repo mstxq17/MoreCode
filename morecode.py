@@ -4,30 +4,41 @@
 import base64
 import argparse
 import re
-import html, binascii, chardet, base64
+import html
+import binascii
+import chardet
+import base64
 import urllib.parse
 import hashlib
 from termcolor import cprint
 
 # configure the format of output
-print_decode = lambda string: cprint(string, 'magenta')
-print_encode = lambda string: cprint(string, 'red')
-print_preview = lambda string: cprint(string, 'green')
-print_type = lambda string: cprint(string, 'blue')
+
+
+def print_decode(string): return cprint(string, 'magenta')
+def print_encode(string): return cprint(string, 'red')
+def print_preview(string): return cprint(string, 'green')
+def print_type(string): return cprint(string, 'blue')
 
 # core class, utils
+
+
 class Utils:
     """utils include many functions to encode/decode"""
+
     def __init__(self, arg=""):
         self.arg = arg
 
     def html_encode(self, string, isChinese):
         print_type("[0] HTML entities Encode:")
         encode1 = html.escape(string, quote=True)
-        encode2 = string.encode('ascii','xmlcharrefreplace').decode()
-        _charref = re.compile('[^(&(#\[0-9\]+;?)]|[^(&(#\[xX\]\[0-9a-fA-F\]+;?)]')
-        encode3 = re.sub(_charref, lambda x:"&#"+str(hex(ord(x.group(0)))).replace("0","")+";", encode2)
-        encode4 = re.sub("[^&](#{1})", lambda x:str(x.group(1)).replace("#","&#"+str(hex(ord("#"))).replace("0","")+";"),encode3)
+        encode2 = string.encode('ascii', 'xmlcharrefreplace').decode()
+        _charref = re.compile(
+            '[^(&(#\[0-9\]+;?)]|[^(&(#\[xX\]\[0-9a-fA-F\]+;?)]')
+        encode3 = re.sub(_charref, lambda x: "&#" +
+                         str(hex(ord(x.group(0)))).replace("0", "")+";", encode2)
+        encode4 = re.sub("[^&](#{1})", lambda x: str(x.group(1)).replace(
+            "#", "&#"+str(hex(ord("#"))).replace("0", "")+";"), encode3)
         print_encode(f"[Normal] >> {encode1}")
         if isChinese:
             print_encode(f"[Chinese] >> {encode2}")
@@ -37,7 +48,7 @@ class Utils:
     def url_encode(self, string):
         print_type("[1] URL Encode:")
         encode1 = urllib.parse.quote(string.encode())
-        encode2 =  ''.join('%{:02X}'.format(c) for c in string.encode())
+        encode2 = ''.join('%{:02X}'.format(c) for c in string.encode())
         print_encode(f"[Normal] >> {encode1}")
         print_encode(f"[ALL] >> {encode2}")
 
@@ -57,13 +68,15 @@ class Utils:
         if isChinese:
             print_encode(f"[chr] >> Not support chinese")
         else:
-            encode1 = "+".join(["chr("+str(ord(i)) + ")" for i in  string])
-            encode2 = "&".join(["chr("+str(ord(i)) + ")" for i in  string])
+            encode1 = "+".join(["chr("+str(ord(i)) + ")" for i in string])
+            encode2 = "&".join(["chr("+str(ord(i)) + ")" for i in string])
             print_encode(f"[chr:+] >> {encode1}")
             print_encode(f"[chr:&] >> {encode2}")
 
-
-
+    def unicode_decode(self, string):
+        print_type("[5] Unicode Decode:")
+        print_decode(f"[Normal] >> {string}")
+        print(string)
 
     def html_decode(self, string):
         print_type("[0] HTML entities Decode:")
@@ -114,6 +127,8 @@ def decode(string, isChinese):
     utils.url_decode(string)
     utils.base64_decode(string)
     utils.chr_decode(string)
+    utils.unicode_decode(string)
+
 
 def encode(string, isChinese):
     print_preview("\nEnCode Result:")
@@ -124,7 +139,6 @@ def encode(string, isChinese):
     utils.md5_encode(string)
     utils.base64_encode(string)
     utils.chr_encode(string, isChinese)
-
 
 
 # handle input param
@@ -143,11 +157,15 @@ def parse_param():
     """
     print(logo)
     parser = argparse.ArgumentParser()
-    parser.add_argument("-d", "--decode", help="decode string", action="store_true")
-    parser.add_argument("-e", "--encode", help="encode string", action="store_true")
-    parser.add_argument("string", type=str, default="", help="converted-string")
+    parser.add_argument(
+        "-d", "--decode", help="decode string", action="store_true")
+    parser.add_argument(
+        "-e", "--encode", help="encode string", action="store_true")
+    parser.add_argument("string", type=str, default="",
+                        help="converted-string")
     args = parser.parse_args()
     return args
+
 
 def main():
     args = parse_param()
@@ -156,11 +174,12 @@ def main():
     isChinese = priview_handle(string)
     # start to handle the input string
     if args.decode == True:
-        result =  decode(string, isChinese)
+        result = decode(string, isChinese)
     if args.encode == True:
-        result =  encode(string, isChinese)
+        result = encode(string, isChinese)
     if not args.decode and not args.encode:
         print("missing type to hanle string, example -d abc or -e abc")
+
 
 if __name__ == '__main__':
     main()
