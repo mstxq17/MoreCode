@@ -60,7 +60,7 @@ class Utils:
 
     def base64_encode(self, string):
         print_type("[3] BASE64 Encode:")
-        encode1 = base64.b64encode(string.encode())
+        encode1 = base64.b64encode(string.encode()).decode('utf-8')
         print_encode(f"[base64] >> {encode1}")
 
     def chr_encode(self, string, isChinese):
